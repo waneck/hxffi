@@ -1,0 +1,53 @@
+<xml>
+
+<include name="${HXCPP}/build-tool/BuildCommon.xml"/>
+<set name="LIBFFI" value="./libffi-mini/Mac/" if="macos"/>
+
+<set name="mobile" value="1" if="iphone"/>
+<set name="mobile" value="1" if="android"/>
+<set name="mobile" value="1" if="webos"/>
+<set name="mobile" value="1" if="gph"/>
+
+<set name="tool" value="exe" unless="iphone"/>
+<set name="tool" value="static" if="iphone"/>
+
+<set name="LIBEXTRA" value=".iphoneos" if="iphoneos"/>
+<set name="LIBEXTRA" value=".iphonesim" if="iphonesim"/>
+<set name="LIBPREFIX" value="lib" if="iphoneos"/>
+<set name="LIBPREFIX" value="lib" if="iphonesim"/>
+
+<files id="libffi_mac" dir="${LIBFFI}">
+  <compilerflag value="-I${LIBFFI}"/>
+  <file name="darwin.S" unless="HXCPP_M64"/>
+  <file name="darwin64.S" if="HXCPP_M64" />
+</files>
+
+<files id="libffi_common" dir="${LIBFFI}">
+  <compilerflag value="-I${LIBFFI}"/>
+  <file name="closures.c"/>
+  <file name="debug.c"/>
+  <file name="dlmalloc.c"/>
+  <file name="ffi.c" unless="HXCPP_M64"/>
+  <file name="ffi64.c" if="HXCPP_M64" />
+  <file name="java_raw_api.c"/>
+  <file name="prep_cif.c"/>
+  <file name="raw_api.c"/>
+  <file name="types.c"/>
+</files>
+
+<files id="my_libffi" dir="./">
+	<compilerflag value="-I${LIBFFI}"/>
+	<file name="libffi.cpp"/>
+</files>
+
+<target id="libffi" output="${LIBPREFIX}hxffi${DBG}${LIBEXTRA}" tool="linker" toolid="${STD_MODULE_LINK}">
+  <ext value=".ndll" unless="mobile"/>
+  <files id="libffi_common"/>
+  <files id="libffi_mac" if="macos"/>
+  <files id="my_libffi"/>
+  <lib name="wsock32.lib" if="windows"/>
+  <outdir name="../ndll/${BINDIR}"/>
+</target>
+
+<target id="default"> <target id="libffi" /> </target>
+</xml>
