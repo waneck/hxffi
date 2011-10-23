@@ -45,11 +45,13 @@ value test_ffi()
 	values[2] = &d;
 	args[3] = &ffi_type_longdouble;
 	values[3] = &ld;
-
+	
+	printf("this is the new one%d\n", 3);
 	/* Initialize the cif */
-	if(ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 4,
+	if(ffi_prep_cif(&cif, FFI_SYSV, 4,
 	     &ffi_type_sint, args) != FFI_OK)
 	{
+		printf("error #%d", ffi_prep_cif(&cif, FFI_SYSV, 4, &ffi_type_sint, args));
 		return NULL;
 	}
 
