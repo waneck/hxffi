@@ -2,6 +2,8 @@
 
 <include name="${HXCPP}/build-tool/BuildCommon.xml"/>
 <set name="LIBFFI" value="./libffi-mini/Mac/" if="macos"/>
+<set name="LIBFFI" value="./libffi-mini/iPhone/" if="iphone"/>
+<set name="TARGET_IPHONE_SIMULATOR" value="1" if="iphonesim"/>
 
 <set name="mobile" value="1" if="iphone"/>
 <set name="mobile" value="1" if="android"/>
@@ -35,6 +37,18 @@
   <file name="types.c"/>
 </files>
 
+<files id="libffi_iphone" dir="${LIBFFI}">
+  <compilerflag value="-I${LIBFFI}"/>
+  <compilerflag value="-DTARGET_IPHONE_SIMULATOR" if="iphonesim"/>
+  <file name="ffi-iphone.c" if="iphoneos"/>
+  <file name="ffi-iphonesimulator.c" if="iphonesim"/>
+  <file name="iphone-sysv.S" if="iphoneos"/>
+  <file name="iphonesimulator-darwin.S" if="iphonesim"/>
+  <file name="prep_cif.c"/>
+  <file name="raw_api.c"/>
+  <file name="types.c"/>
+</files>
+
 <files id="my_libffi" dir="./">
 	<compilerflag value="-I${LIBFFI}"/>
 	<file name="libffi.cpp"/>
@@ -42,8 +56,9 @@
 
 <target id="libffi" output="${LIBPREFIX}hxffi${DBG}${LIBEXTRA}" tool="linker" toolid="${STD_MODULE_LINK}">
   <ext value=".ndll" unless="mobile"/>
-  <files id="libffi_common"/>
+  <files id="libffi_common" unless="iphone"/>
   <files id="libffi_mac" if="macos"/>
+  <files id="libffi_iphone" if="iphone"/>
   <files id="my_libffi"/>
   <lib name="wsock32.lib" if="windows"/>
   <outdir name="../ndll/${BINDIR}"/>
