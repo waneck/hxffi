@@ -26,12 +26,14 @@
 
 <files id="libffi_common" dir="${LIBFFI}">
   <compilerflag value="-I${LIBFFI}"/>
+<!-- Seems unnecessary for our needs (?)
   <file name="closures.c"/>
   <file name="debug.c"/>
   <file name="dlmalloc.c"/>
+  <file name="java_raw_api.c"/>
+-->
   <file name="ffi.c" unless="HXCPP_M64"/>
   <file name="ffi64.c" if="HXCPP_M64" />
-  <file name="java_raw_api.c"/>
   <file name="prep_cif.c"/>
   <file name="raw_api.c"/>
   <file name="types.c"/>

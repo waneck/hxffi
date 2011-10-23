@@ -1,0 +1,11 @@
+-cp test
+-cp ./
+-neko bin/test.n
+-main TestAll
+-lib utest
+--next
+-cp test
+-cp ./
+-cpp bin/testcpp
+-main TestAll
+-lib utest
