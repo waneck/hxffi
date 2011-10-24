@@ -1,0 +1,12 @@
+<project name="hxffi" url="http://code.google.com/p/hxffi/" license="BSD">
+    <user name="waneck"/>
+	<tag v="cross"/>
+    <tag v="utility"/>
+    <tag v="native"/>
+	<tag v="cffi"/>
+	<tag v="libffi"/>
+	<tag v="neko"/>
+	<tag v="cpp"/>
+    <description>HxFFI is a small binding to LibFFI. It provides the ndlls for hxcpp and neko and provides the possibility of calling dlls without the need of a C FII glue code.</description>
+    <version name="0.0.1">Initial version. API should remain stable. Binaries for Mac, Mac64, iPhone and Windows.</version>
+</project>
