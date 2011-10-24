@@ -20,8 +20,8 @@ extern "C"
 #	undef ERROR
 #	include <windows.h>
 #	define dlopen(l,p)		(void*)LoadLibrary(l)
-#	define dlsym(h,n)		GetProcAddress((HANDLE)h,n)
-#	define dlclose(h)		FreeLibrary((HANDLE)h)
+#	define dlsym(h,n)		GetProcAddress((HMODULE)h,n)
+#	define dlclose(h)		FreeLibrary((HMODULE)h)
 #endif
 
 #if defined HX_WINDOWS

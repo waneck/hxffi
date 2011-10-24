@@ -3,6 +3,7 @@
 <include name="${HXCPP}/build-tool/BuildCommon.xml"/>
 <set name="LIBFFI" value="./libffi-mini/Mac/" if="macos"/>
 <set name="LIBFFI" value="./libffi-mini/iPhone/" if="iphone"/>
+<set name="LIBFFI" value="./libffi-mini/Windows/" if="windows"/>
 <set name="TARGET_IPHONE_SIMULATOR" value="1" if="iphonesim"/>
 
 <set name="mobile" value="1" if="iphone"/>
@@ -22,6 +23,12 @@
   <compilerflag value="-I${LIBFFI}"/>
   <file name="darwin.S" unless="HXCPP_M64"/>
   <file name="darwin64.S" if="HXCPP_M64" />
+</files>
+
+<files id="libffi_win" dir="${LIBFFI}">
+  <compilerflag value="-I${LIBFFI}"/>
+  <file name="win32.S" unless="HXCPP_M64"/>
+  <file name="win64.S" if="HXCPP_M64" />
 </files>
 
 <files id="libffi_common" dir="${LIBFFI}">
@@ -60,6 +67,7 @@
   <ext value=".ndll" unless="mobile"/>
   <files id="libffi_common" unless="iphone"/>
   <files id="libffi_mac" if="macos"/>
+  <files id="libffi_win" if="windows"/>
   <files id="libffi_iphone" if="iphone"/>
   <files id="my_libffi"/>
   <lib name="wsock32.lib" if="windows"/>
