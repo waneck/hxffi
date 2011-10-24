@@ -419,7 +419,7 @@ static value hxffi_create_call_interface(value _abi, value _nargs, value _r_type
 	{
 		val_check(_abi, string);
 		const char *val = val_string(_abi);
-		
+#ifndef IPHONE
 #ifdef X86_WIN32
 		if (strcmp(val, "sysv") == 0)
 			abi = FFI_SYSV;
@@ -436,6 +436,10 @@ static value hxffi_create_call_interface(value _abi, value _nargs, value _r_type
 		else if (strcmp(val, "unix64") == 0)
 			abi = FFI_UNIX64;
 		else val_throw(alloc_string("Unknown ABI"));
+#endif
+#else
+		if (strcmp(val, "sysv") != 0)
+			val_throw(alloc_string("Unknown ABI"));
 #endif
 	}
 	

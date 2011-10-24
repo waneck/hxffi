@@ -35,14 +35,15 @@ char *alloca ();
 # endif
 #endif
 
-/* Check for the existence of memcpy. */
+/* Check for the existence of memcpy. *
 #if STDC_HEADERS
 # include <string.h>
 #else
 # ifndef HAVE_MEMCPY
 //#  define memcpy(d, s, n) bcopy ((s), (d), (n))
 # endif
-#endif
+#endif*/
+#include <string.h>
 
 #if defined(FFI_DEBUG)
 #include <stdio.h>
