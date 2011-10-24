@@ -1,6 +1,0 @@
-obj/mscv/ffi64.obj
-obj/mscv/prep_cif.obj
-obj/mscv/raw_api.obj
-obj/mscv/types.obj
-obj/mscv/win64.obj
-obj/mscv/libffi.obj
