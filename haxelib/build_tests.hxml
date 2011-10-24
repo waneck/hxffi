@@ -9,3 +9,4 @@
 -cpp bin/testcpp
 -main TestAll
 -lib utest
+-debug

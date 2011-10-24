@@ -14,6 +14,22 @@ extern "C"
 #include <ffi.h>
 #include <ffi_common.h>
 
+#ifndef HX_WINDOWS
+#	include <dlfcn.h>
+#else
+#	undef ERROR
+#	include <windows.h>
+#	define dlopen(l,p)		(void*)LoadLibrary(l)
+#	define dlsym(h,n)		GetProcAddress((HANDLE)h,n)
+#	define dlclose(h)		FreeLibrary((HANDLE)h)
+#endif
+
+#if defined HX_WINDOWS
+	#define HXFFI_EXPORT __declspec(dllexport)
+#else
+  #define HXFFI_EXPORT __attribute__ ((__visibility__("default")))
+#endif
+
 typedef enum
 {
 	hxffi_zero, //zero
@@ -74,6 +90,70 @@ typedef struct {
 
 DECLARE_KIND(k_hxffi_pointer);
 DEFINE_KIND(k_hxffi_pointer);
+
+DECLARE_KIND(k_hxffi_dlib);
+DEFINE_KIND(k_hxffi_dlib);
+
+/////////////////////////  DYLD IMPLEMENTATION   ////////////////////////////
+
+static value hxffi_dlopen(value str)
+{
+	val_check(str, string);
+	
+	void *lib = dlopen(val_string(str), RTLD_LAZY);
+	if (NULL == lib)
+	{
+		return alloc_int(-1); //hxcpp bug with alloc_null
+	}
+	
+	return alloc_abstract(k_hxffi_dlib, lib);
+}
+
+DEFINE_PRIM(hxffi_dlopen, 1);
+
+static value hxffi_cur_dlopen()
+{
+	void *h;
+#ifdef HX_WINDOWS
+	h = (void*)GetModuleHandle(NULL);
+#else
+	h = dlopen(NULL,RTLD_LAZY);
+#endif
+	
+	return alloc_abstract(k_hxffi_dlib, h);
+}
+
+DEFINE_PRIM(hxffi_cur_dlopen, 0);
+
+static value hxffi_dlsym(value handle, value name)
+{
+	val_check_kind(handle, k_hxffi_dlib);
+	val_check(name, string);
+	
+	void *h = val_data(handle);
+	void *ret = dlsym(h, val_string(name));
+	if (NULL == ret)
+		return alloc_int(-1); //hxcpp bug with alloc_null
+	
+	return alloc_abstract(k_hxffi_pointer, ret);
+}
+
+DEFINE_PRIM(hxffi_dlsym, 2);
+
+static value hxffi_dlclose(value handle)
+{
+	val_check_kind(handle, k_hxffi_dlib);
+	
+	void *h = val_data(handle);
+	if (NULL != h)
+		dlclose(h);
+	
+	return alloc_int(-1); //hxcpp bug with alloc_null
+}
+
+DEFINE_PRIM(hxffi_dlclose, 1);
+
+///////////////////////// LIBFFI IMPLEMENTATION ////////////////////////////
 
 DECLARE_KIND(k_hxffi_type_array);
 DEFINE_KIND(k_hxffi_type_array);
@@ -241,7 +321,7 @@ static value hxffi_set_descriptor_value(value _type_arr, value _index_pos, value
 	type_arr->arr[index_pos] = type_val;
 	type_arr->native_types[index_pos] = hxffi_zero;
 	
-	return alloc_int(0);
+	return alloc_int(-1); //hxcpp bug with alloc_null
 }
 
 DEFINE_PRIM(hxffi_set_descriptor_value, 3);
@@ -327,7 +407,7 @@ static value hxffi_set_descriptor_native_value(value _type_arr, value _index_pos
 			neko_error();
 	}
 	
-	return alloc_int(0);
+	return alloc_int(-1); //hxcpp bug with alloc_null
 }
 
 DEFINE_PRIM(hxffi_set_descriptor_native_value, 3);
@@ -565,12 +645,12 @@ static value hxffi_call_cif(value *args, int _nargs)
 	printf("calling now...\n");
 	ffi_call(hxcif->cif, FFI_FN(fun), retval, values);
 	
-	return alloc_int(0);
+	return alloc_int(-1); //hxcpp bug with alloc_null
 }
 
 DEFINE_PRIM_MULT(hxffi_call_cif);
 
-static int checking(int a, short b, signed char c)
+HXFFI_EXPORT int checking(int a, short b, signed char c)
 {
   return (a < 0 && b < 0 && c < 0);
 }
