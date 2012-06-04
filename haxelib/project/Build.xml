@@ -4,6 +4,7 @@
 <set name="LIBFFI" value="./libffi-mini/Mac/" if="macos"/>
 <set name="LIBFFI" value="./libffi-mini/iPhone/" if="iphone"/>
 <set name="LIBFFI" value="./libffi-mini/Windows/" if="windows"/>
+<set name="LIBFFI" value="./libffi-mini/Linux/" if="linux"/>
 <set name="TARGET_IPHONE_SIMULATOR" value="1" if="iphonesim"/>
 
 <set name="mobile" value="1" if="iphone"/>
@@ -30,6 +31,13 @@
   <file name="win32.S" unless="HXCPP_M64"/>
   <file name="win64.S" if="HXCPP_M64" />
 </files>
+
+<files id="libffi_linux" dir="${LIBFFI}">
+  <compilerflag value="-I${LIBFFI}"/>
+  <file name="sysv.S" unless="HXCPP_M64"/>
+  <file name="unix64.S" if="HXCPP_M64" />
+</files>
+
 
 <files id="libffi_common" dir="${LIBFFI}">
   <compilerflag value="-I${LIBFFI}"/>
@@ -69,8 +77,10 @@
   <files id="libffi_mac" if="macos"/>
   <files id="libffi_win" if="windows"/>
   <files id="libffi_iphone" if="iphone"/>
+  <files id="libffi_linux" if="linux"/>
   <files id="my_libffi"/>
   <lib name="wsock32.lib" if="windows"/>
+  <lib name="-ldl" if="linux"/>
   <outdir name="../ndll/${BINDIR}"/>
 </target>
 
