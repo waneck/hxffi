@@ -15,7 +15,7 @@ class TestAll
 #if neko
      public static function loadNekoAPI()
      {
-        var init = neko.Lib.load("neko_init", 5);
+        var init = neko.Lib.load("hxffi", "neko_init", 5);
         if (init != null)
         {
            init(function(s) return new String(s),
