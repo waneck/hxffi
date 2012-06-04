@@ -103,7 +103,7 @@ static value hxffi_dlopen(value str)
 	void *lib = dlopen(val_string(str), RTLD_LAZY);
 	if (NULL == lib)
 	{
-		return alloc_int(-1); //hxcpp bug with alloc_null
+		return alloc_null();
 	}
 	
 	return alloc_abstract(k_hxffi_dlib, lib);
@@ -133,7 +133,7 @@ static value hxffi_dlsym(value handle, value name)
 	void *h = val_data(handle);
 	void *ret = dlsym(h, val_string(name));
 	if (NULL == ret)
-		return alloc_int(-1); //hxcpp bug with alloc_null
+		return alloc_null();
 	
 	return alloc_abstract(k_hxffi_pointer, ret);
 }
@@ -148,7 +148,7 @@ static value hxffi_dlclose(value handle)
 	if (NULL != h)
 		dlclose(h);
 	
-	return alloc_int(-1); //hxcpp bug with alloc_null
+	return alloc_null();
 }
 
 DEFINE_PRIM(hxffi_dlclose, 1);
@@ -258,6 +258,15 @@ static value hxffi_get_native_type(value ntype)
 
 DEFINE_PRIM(hxffi_get_native_type, 1);
 
+static void hxffi_type_finalize_struct(value v)
+{
+	ffi_type *ft = ((ffi_type *) val_data(v));
+	if (!ft->elements)
+		printf("WARNING: finalizing null struct");
+	else
+		delete ft->elements;
+}
+
 static value hxffi_create_struct_type(value _hxffi_types_array)
 {
 	val_check(_hxffi_types_array, array);
@@ -268,7 +277,8 @@ static value hxffi_create_struct_type(value _hxffi_types_array)
 	tm_type_elements[size] = NULL;
 	
 	tm_type->size = tm_type->alignment = 0;
-	tm_type_elements = tm_type_elements;
+	tm_type->type = FFI_TYPE_STRUCT;
+	tm_type->elements = tm_type_elements;
 	
 	int i = 0;
 	for (i = 0; i < size; i++)
@@ -282,10 +292,27 @@ static value hxffi_create_struct_type(value _hxffi_types_array)
 			neko_error(); //TODO cleanup if fail
 	}
 	
-	return alloc_abstract(k_hxffi_type, tm_type);
+	value ret = alloc_abstract(k_hxffi_type, tm_type);
+	val_gc(ret,hxffi_type_finalize_struct);
+	return ret;
 }
 
 DEFINE_PRIM(hxffi_create_struct_type, 1)
+
+static void hxffi_type_array_finalize(value v)
+{
+	val_check_kind(v, k_hxffi_type_array);
+	hxffi_type_array *ft = ((hxffi_type_array *) val_data(v));
+	if (!ft->arr)
+		printf("WARNING: finalizing null arr");
+	else
+		delete ft->arr;
+	
+	if (!ft->native_types)
+		printf("WARNING: finalizing null native_types");
+	else
+		delete ft->native_types;
+}
 
 static value hxffi_create_type_descriptor_array(value num_args)
 {
@@ -297,7 +324,9 @@ static value hxffi_create_type_descriptor_array(value num_args)
 	ret->arr = new ffi_type *[nargs + 1];
 	ret->native_types = new hxffi_types[nargs + 1];
 	
-	return alloc_abstract(k_hxffi_type_array, ret);
+	value _ret = alloc_abstract(k_hxffi_type_array, ret);
+	val_gc(_ret, hxffi_type_array_finalize);
+	return _ret;
 }
 
 DEFINE_PRIM(hxffi_create_type_descriptor_array, 1);
@@ -321,7 +350,7 @@ static value hxffi_set_descriptor_value(value _type_arr, value _index_pos, value
 	type_arr->arr[index_pos] = type_val;
 	type_arr->native_types[index_pos] = hxffi_zero;
 	
-	return alloc_int(-1); //hxcpp bug with alloc_null
+	return alloc_null();
 }
 
 DEFINE_PRIM(hxffi_set_descriptor_value, 3);
@@ -407,10 +436,19 @@ static value hxffi_set_descriptor_native_value(value _type_arr, value _index_pos
 			neko_error();
 	}
 	
-	return alloc_int(-1); //hxcpp bug with alloc_null
+	return alloc_null();
 }
 
 DEFINE_PRIM(hxffi_set_descriptor_native_value, 3);
+
+static void hxffi_cif_finalize(value v)
+{
+	hxffi_cif *cif = ((hxffi_cif *) val_data(v));
+	if (!cif->cif)
+		printf("WARNING: finalizing null cif");
+	else
+		delete cif->cif;
+}
 
 static value hxffi_create_call_interface(value _abi, value _nargs, value _r_type, value _type_arr)
 {
@@ -462,7 +500,9 @@ static value hxffi_create_call_interface(value _abi, value _nargs, value _r_type
 	_ret->cif = ret;
 	_ret->type_array = type_arr;
 	
-	return alloc_abstract(k_hxffi_cif, _ret);
+	value ret_abs = alloc_abstract(k_hxffi_cif, _ret);
+	val_gc(ret_abs, hxffi_cif_finalize);
+	return ret_abs;
 }
 
 DEFINE_PRIM(hxffi_create_call_interface, 4)
@@ -506,14 +546,14 @@ static value hxffi_call_cif(value *args, int _nargs)
 		nargs = hxcif->type_array->size + 3;
 	
 	void **values = new void *[nargs - 2];
-	values[nargs - 1] = NULL;
+	values[nargs - 3] = NULL;
 	
 	UINT64 *real_vals = new UINT64[nargs - 3]; // alloc an array big enough for all references
+	UINT64 *orig_real_vals = real_vals;
 	
 	int i = 3;
 	for (i = 3; i < nargs; i++)
 	{
-
 		int ival = 0;
 		double dval = 0.0;
 		
@@ -646,10 +686,12 @@ static value hxffi_call_cif(value *args, int _nargs)
 		real_vals++;
 	}
 	
-	printf("calling now...\n");
 	ffi_call(hxcif->cif, FFI_FN(fun), retval, values);
 	
-	return alloc_int(-1); //hxcpp bug with alloc_null
+	delete values;
+	delete orig_real_vals;
+	
+	return alloc_null();
 }
 
 DEFINE_PRIM_MULT(hxffi_call_cif);

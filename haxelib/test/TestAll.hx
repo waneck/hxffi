@@ -4,6 +4,17 @@ class TestAll
 	public static function main()
 	{
 		#if neko loadNekoAPI(); #end
+		
+		runTests();
+#if cpp
+		//test finalizers
+		cpp.vm.Gc.run(true);
+		cpp.vm.Gc.run(true);
+#end
+	}
+	
+	public static function runTests()
+	{
 		var runner = new utest.Runner();
 
 		runner.addCase(new BasicTests());
