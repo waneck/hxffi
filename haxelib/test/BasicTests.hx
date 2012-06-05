@@ -100,7 +100,8 @@ class BasicTests
 		var pointer = FunctionPointer.withHandle(checking_addr());
 		var ret = Bytes.alloc(4); //just to be safe
 		
-		cif.call(pointer, ret.getData(), -6,-12,-1);
+		//testing call dynamic
+		cif.callDynamic(pointer, ret.getData(), [-6,-12,-1]);
 		
 		var b = new haxe.io.BytesInput(ret);
 		var ret = b.readInt31();

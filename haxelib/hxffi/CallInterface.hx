@@ -41,6 +41,13 @@ class CallInterface
 		_call(this._handle, untyped func._handle, retval, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 	}
 	
+	public function callDynamic(func:FunctionPointer, retval:Null<haxe.io.BytesData>, args:Array<Dynamic>):Void
+	{
+		var allArgs:Array<Dynamic> = [this._handle, untyped func._handle, retval];
+		allArgs = allArgs.concat(args);
+		Reflect.callMethod(null, _call, allArgs);
+	}
+	
 	private static var _call:Dynamic = Lib.load("hxffi", "hxffi_call_cif", -1);
 	private static var _create:Dynamic = Lib.load("hxffi", "hxffi_create_call_interface", 4);
 }
