@@ -41,41 +41,6 @@ class CallInterface
 		_call(this._handle, untyped func._handle, retval, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 	}
 	
-	public inline function call0(func:FunctionPointer, retval:Null<haxe.io.BytesData>):Void
-	{
-		_call(this._handle, untyped func._handle, retval);
-	}
-	
-	public inline function call1(func:FunctionPointer, retval:Null<haxe.io.BytesData>, ?arg1):Void
-	{
-		_call(this._handle, untyped func._handle, retval, arg1);
-	}
-	
-	public inline function call2(func:FunctionPointer, retval:Null<haxe.io.BytesData>, ?arg1, ?arg2):Void
-	{
-		_call(this._handle, untyped func._handle, retval, arg1, arg2);
-	}
-	
-	public inline function call3(func:FunctionPointer, retval:Null<haxe.io.BytesData>, ?arg1, ?arg2, ?arg3):Void
-	{
-		_call(this._handle, untyped func._handle, retval, arg1, arg2, arg3);
-	}
-	
-	public inline function call4(func:FunctionPointer, retval:Null<haxe.io.BytesData>, ?arg1, ?arg2, ?arg3, ?arg4):Void
-	{
-		_call(this._handle, untyped func._handle, retval, arg1, arg2, arg3, arg4);
-	}
-	
-	public inline function call5(func:FunctionPointer, retval:Null<haxe.io.BytesData>, ?arg1, ?arg2, ?arg3, ?arg4, ?arg5):Void
-	{
-		_call(this._handle, untyped func._handle, retval, arg1, arg2, arg3, arg4, arg5);
-	}
-	
-	public inline function call6(func:FunctionPointer, retval:Null<haxe.io.BytesData>, ?arg1, ?arg2, ?arg3, ?arg4, ?arg5, ?arg6):Void
-	{
-		_call(this._handle, untyped func._handle, retval, arg1, arg2, arg3, arg4, arg5, arg6);
-	}
-	
 	private static var _call:Dynamic = Lib.load("hxffi", "hxffi_call_cif", -1);
 	private static var _create:Dynamic = Lib.load("hxffi", "hxffi_create_call_interface", 4);
 }

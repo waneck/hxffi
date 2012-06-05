@@ -44,7 +44,7 @@ class BasicTests
 		var cif = CallInterface.ofNativeTypes([TInt, TShort, TChar], TInt);
 		var ret = Bytes.alloc(4); //just to be safe
 		
-		cif.call3(pointer, ret.getData(), -6,-12,-1);
+		cif.call(pointer, ret.getData(), -6,-12,-1);
 		
 		var b = new haxe.io.BytesInput(ret);
 		var ret = b.readInt31();
@@ -100,7 +100,7 @@ class BasicTests
 		var pointer = FunctionPointer.withHandle(checking_addr());
 		var ret = Bytes.alloc(4); //just to be safe
 		
-		cif.call3(pointer, ret.getData(), -6,-12,-1);
+		cif.call(pointer, ret.getData(), -6,-12,-1);
 		
 		var b = new haxe.io.BytesInput(ret);
 		var ret = b.readInt31();
