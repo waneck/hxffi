@@ -1,0 +1,13 @@
+{
+  "name": "hxffi",
+  "url": "https://github.com/waneck/hxffi",
+  "license": "BSD",
+  "tags": ["cross","utility","native","cffi","libffi","neko","cpp"],
+  "description": "HxFFI is a small binding to LibFFI. It provides the ndlls for hxcpp and neko and provides the possibility of calling dlls without the need of a C FII glue code.",
+  "version": "0.0.3",
+  "releasenote": "Initial version. API should remain stable. Binaries for Mac, Mac64, iPhone, iPhone Sim and Windows.",
+  "contributors": ["waneck"],
+  "dependencies": {
+
+  }
+}
