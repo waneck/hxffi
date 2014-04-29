@@ -3,6 +3,7 @@
 -neko bin/test.n
 -main TestAll
 -lib utest
+-lib hxffi
 --next
 -cp test
 -cp ./
