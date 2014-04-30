@@ -696,59 +696,6 @@ static value hxffi_call_cif(value *args, int _nargs)
 
 DEFINE_PRIM_MULT(hxffi_call_cif);
 
-HXFFI_EXPORT int checking(int a, short b, signed char c)
-{
-  return (a < 0 && b < 0 && c < 0);
-}
-
-static value hxffi_get_address_checking()
-{
-	void *addr = (void *) &checking;
-	return alloc_abstract(k_hxffi_pointer, addr);
-}
-
-DEFINE_PRIM(hxffi_get_address_checking, 0);
-
-value hxffi_test_ffi()
-{
-	ffi_cif cif;
-	ffi_type *args[10];
-	void *values[10];
-	ffi_arg rint;
-
-	signed int si;
-	signed short ss;
-	signed char sc;
-
-	args[0] = &ffi_type_sint;
-	values[0] = &si;
-	args[1] = &ffi_type_sshort;
-	values[1] = &ss;
-	args[2] = &ffi_type_schar;
-	values[2] = &sc;
-
-	/* Initialize the cif */
-	if(ffi_prep_cif(&cif, FFI_DEFAULT_ABI, 3,
-	     &ffi_type_sint, args) != FFI_OK)
-		neko_error();
-
-	si = -6;
-	ss = -12;
-	sc = -1;
-
-	checking (si, ss, sc);
-
-	ffi_call(&cif, FFI_FN(checking), &rint, values);
-
-	printf ("%d vs %d\n", (int)rint, checking (si, ss, sc));
-
-	if (!rint) neko_error();
-	
-	return alloc_int(0);
-}
-
-DEFINE_PRIM(hxffi_test_ffi, 0);
-
 // Reference this to bring in all the symbols for the static library
 int hxffi_register_prims() { return 0; }
 
