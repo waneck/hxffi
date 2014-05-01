@@ -114,11 +114,7 @@ DEFINE_PRIM(hxffi_dlopen, 1);
 static value hxffi_cur_dlopen()
 {
 	void *h;
-#ifdef HX_WINDOWS
-	h = (void*)GetModuleHandle(NULL);
-#else
 	h = dlopen(NULL,RTLD_LAZY);
-#endif
 	
 	return alloc_abstract(k_hxffi_dlib, h);
 }
@@ -171,6 +167,74 @@ static value hxffi_get_addressof(value dynamic)
 }
 
 DEFINE_PRIM(hxffi_get_addressof, 1);
+
+static value hxffi_pointer_size()
+{
+	return alloc_int(sizeof(void *));
+}
+DEFINE_PRIM(hxffi_pointer_size,0);
+
+static int _hxffi_get_type_size(hxffi_types t)
+{
+	switch(t)
+	{
+		case hxffi_type_void:
+			return 0;
+		case hxffi_type_uint8:
+			return 1;
+		case hxffi_type_sint8:
+			return 1;
+		case hxffi_type_uint16:
+			return 2;
+		case hxffi_type_sint16:
+			return 2;
+		case hxffi_type_uint32:
+			return 4;
+		case hxffi_type_sint32:
+			return 4;
+		case hxffi_type_uint64:
+			return 8;
+		case hxffi_type_sint64:
+			return 8;
+		case hxffi_type_float:
+			return 4;
+		case hxffi_type_double:
+			return 8;
+		case hxffi_type_uchar:
+			return sizeof(unsigned char);
+		case hxffi_type_schar:
+			return sizeof(signed char);
+		case hxffi_type_ushort:
+			return sizeof(unsigned short);
+		case hxffi_type_sshort:
+			return sizeof(signed short);
+		case hxffi_type_uint:
+			return sizeof(unsigned int);
+		case hxffi_type_sint:
+			return sizeof(signed int);
+		case hxffi_type_ulong:
+			return sizeof(unsigned long);
+		case hxffi_type_slong:
+			return sizeof(signed long);
+		case hxffi_type_pointer:
+			return sizeof(void *);
+		default:
+			buffer buf = alloc_buffer("Invalid hxffi_type: ");
+			val_buffer(buf,alloc_int(t));
+			val_throw( buffer_val(buf) );
+	}
+	return -1;
+}
+
+value hxffi_get_type_size(value ntype)
+{
+	val_check(ntype, int);
+	hxffi_types t = ((hxffi_types)(val_int(ntype) + 1));
+	
+	return alloc_int(_hxffi_get_type_size(t));
+}
+
+DEFINE_PRIM(hxffi_get_type_size, 1);
 
 static ffi_type *_hxffi_get_native_type(hxffi_types t)
 {
@@ -239,7 +303,9 @@ static ffi_type *_hxffi_get_native_type(hxffi_types t)
 			ret = &ffi_type_pointer;
 			break;
 		default:
-			neko_error();
+			buffer buf = alloc_buffer("Invalid hxffi_type: ");
+			val_buffer(buf,alloc_int(t));
+			val_throw( buffer_val(buf) );
 	}
 	
 	ffi_type *retval = new ffi_type;
@@ -262,7 +328,7 @@ static void hxffi_type_finalize_struct(value v)
 {
 	ffi_type *ft = ((ffi_type *) val_data(v));
 	if (!ft->elements)
-		printf("WARNING: finalizing null struct");
+		fprintf(stderr,"WARNING: finalizing null struct");
 	else
 		delete ft->elements;
 }
