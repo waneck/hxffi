@@ -2,7 +2,9 @@ OBJS=testlib.o
 
 EXT=so
 
-CFLAGS= -shared -fPIC
+M32=
+
+CFLAGS= -shared -fPIC ${M32} -pthread
 
 ../../bin/testlib.${EXT}: ${OBJS}
 	${CC} ${CFLAGS} $< -o $@

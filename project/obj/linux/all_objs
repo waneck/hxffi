@@ -1,0 +1,6 @@
+obj/linux/93c60d7e_ffi.o
+obj/linux/93c60d7e_prep_cif.o
+obj/linux/93c60d7e_raw_api.o
+obj/linux/93c60d7e_types.o
+obj/linux/93c60d7e_sysv.o
+obj/linux/93c60d7e_libffi.o
